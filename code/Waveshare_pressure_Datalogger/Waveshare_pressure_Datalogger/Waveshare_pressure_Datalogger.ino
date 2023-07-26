@@ -39,7 +39,7 @@ SFE_BMP180 pressure;
 unsigned long duration;
 unsigned long very_first_starttime;
 unsigned long starttime;
-unsigned long sampletime_ms = 1;
+unsigned long sampletime_ms = 10;
 unsigned long lowpulseoccupancy = 0;
 float ratio = 0;
 float concentration = 0;
@@ -137,7 +137,7 @@ void setup() {
     // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     // This line sets the RTC with an explicit date & time, for example to set
     // January 21, 2014 at 3am you would call:
-    // RTC.adjust(DateTime(2023, 7, 25, 11, 3, 0));
+    // RTC.adjust(DateTime(2023, 7, 25, 13, 27, 0));
   }
 
 // Initialize the sensor (it is important to get calibration values stored on the device).
@@ -171,9 +171,14 @@ void loop() {
   // make a string for assembling the data to log:
   String dataString = "";
 
-  //if ((millis()-starttime) > sampletime_ms)//if the sampel time == 30s
-  if(1)//if the sampel time == 30s
+  // Serial.println((millis()-starttime));
+  // Serial.println(sampletime_ms);
+  // Serial.println((millis()-starttime) > sampletime_ms);
+
+  if ((millis()-starttime) > sampletime_ms)//if the sampel time == 30s
+  // if(1)//if the sampel time == 30s
   {
+
     /*
        * get adcvalue
        */
@@ -201,6 +206,7 @@ void loop() {
         density = 0;
         
       starttime = millis();
+
   }
 
   status = pressure.startTemperature();
@@ -248,9 +254,14 @@ void loop() {
     else Serial.println("error retrieving temperature measurement\n");
   }
   else Serial.println("error starting temperature measurement\n");     
-          
-  dataString = datetime + ", " + String(density) + ", " + String(P) + ", " + String(T);
-  Serial.println(dataString);
+  
+  // Serial.println("pre dataString");
+  // Serial.println(String(density));
+  // Serial.println(String(P));
+  // Serial.println(String(T));
+  // Serial.println(datetime + ", " + String(density) + ", " + String(P) + ", " + String(T));
+  // dataString = datetime + ", " + String(density) + ", " + String(P) + ", " + String(T);
+
   // if the file is available, write to it:
   String filename = "WaveGP2.txt";
 //  Serial.println(filename);
@@ -258,10 +269,10 @@ void loop() {
   File logfile = SD.open(filename, FILE_WRITE);
   
   if (logfile) {
-    logfile.println(dataString);
+    logfile.println(datetime + ", " + String(density) + ", " + String(P) + ", " + String(T));
     // logfile.close(); Don't seem to have to close the file...
     // print to the serial port too:
-    Serial.println(dataString);
+    Serial.println(datetime + ", " + String(density) + ", " + String(P) + ", " + String(T));
 
     logfile.close();
   }
